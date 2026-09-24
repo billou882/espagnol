@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercices SER y ESTAR</title>
+  <style>
+    :root {
+      --bg-color: #f4f6f9;
+      --card-bg: #ffffff;
+      --primary: #4a90e2;
+      --success: #2ecc71;
+      --error: #e74c3c;
+      --text: #2c3e50;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .container {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      max-width: 650px;
+      width: 100%;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-top: 0;
+    }
+
+    .level-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 25px;
+      gap: 10px;
+    }
+
+    .level-btn {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid var(--primary);
+      background-color: white;
+      color: var(--primary);
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+
+    .level-btn.active, .level-btn:hover {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .progress {
+      text-align: right;
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 15px;
+    }
+
+    .exercise-card {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 5px solid var(--primary);
+      margin-bottom: 20px;
+    }
+
+    .sentence {
+      font-size: 1.25em;
+      line-height: 1.6;
+    }
+
+    input[type="text"] {
+      font-size: 1em;
+      padding: 6px 10px;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      width: 110px;
+      text-align: center;
+      font-weight: bold;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+
+    .accents-toolbar {
+      margin-top: 10px;
+      display: flex;
+      gap: 5px;
+    }
+
+    .accent-btn {
+      padding: 4px 8px;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .accent-btn:hover {
+      background: #e0e0e0;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .action-btn:hover {
+      opacity: 0.9;
+    }
+
+    .feedback {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      display: none;
+    }
+
+    .feedback.correct {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      display: block;
+    }
+
+    .feedback.incorrect {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      display: block;
+    }
+
+    .explanation {
+      margin-top: 5px;
+      font-weight: normal;
+      font-size: 0.95em;
+    }
+
+    .score-box {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .score-box h2 {
+      font-size: 2em;
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>SER vs ESTAR</h1>
+  
+  <div class="level-nav">
+    <button class="level-btn active" onclick="changeLevel(0)">Niveau 1 : Facile</button>
+    <button class="level-btn" onclick="changeLevel(1)">Niveau 2 : Moyen</button>
+    <button class="level-btn" onclick="changeLevel(2)">Niveau 3 : Difficile</button>
+  </div>
+
+  <div id="quiz-container">
+    <div class="progress" id="progress">Question 1 sur 5</div>
+
+    <div class="exercise-card">
+      <div class="sentence" id="sentence"></div>
+      <div class="accents-toolbar">
+        <span style="font-size:0.85em; color:#666; align-self:center;">Caractères :</span>
+        <button class="accent-btn" onclick="insertChar('á')">á</button>
+        <button class="accent-btn" onclick="insertChar('é')">é</button>
+        <button class="accent-btn" onclick="insertChar('í')">í</button>
+        <button class="accent-btn" onclick="insertChar('ó')">ó</button>
+        <button class="accent-btn" onclick="insertChar('ú')">ú</button>
+        <button class="accent-btn" onclick="insertChar('ñ')">ñ</button>
+      </div>
+    </div>
+
+    <button class="action-btn" id="submit-btn" onclick="checkAnswer()">Vérifier</button>
+
+    <div id="feedback" class="feedback">
+      <div id="feedback-text"></div>
+      <div id="explanation-text" class="explanation"></div>
+    </div>
+  </div>
+
+  <div id="score-container" class="score-box" style="display: none;">
+    <h2>Niveau Terminé !</h2>
+    <p id="final-score" style="font-size: 1.5em;"></p>
+    <button class="action-btn" onclick="restartLevel()">Recommencer ce niveau</button>
+  </div>
+</div>
+
+<script>
+  const exercises = [
+    // Niveau 1 : Présent simple / Cas de base
+    [
+      {
+        before: "Yo ",
+        after: " estudiante de español.",
+        answer: "soy",
+        explanation: "On utilise **SER** pour indiquer l'identité ou la profession."
+      },
+      {
+        before: "Mis hermanos ",
+        after: " en casa hoy.",
+        answer: "están",
+        explanation: "On utilise **ESTAR** pour la localisation dans l'espace."
+      },
+      {
+        before: "Hoy María ",
+        after: " muy contenta.",
+        answer: "está",
+        explanation: "On utilise **ESTAR** pour exprimer un état d'esprit temporaire[cite: 1]."
+      },
+      {
+        before: "Nosotros ",
+        after: " de España.",
+        answer: "somos",
+        explanation: "On utilise **SER** pour la nationalité ou l'origine[cite: 1]."
+      },
+      {
+        before: "¿Tú ",
+        after: " preparado para el examen?",
+        answer: "estás",
+        explanation: "On utilise **ESTAR** pour un état d'avancement ou de préparation."
+      }
+    ],
+    // Niveau 2 : Nuances de sens au présent
+    [
+      {
+        before: "Esta manzana ",
+        after: " verde, aún no se puede comer.",
+        answer: "está",
+        explanation: "**Estar verde** signifie que le fruit n'est pas mûr (état temporaire)."
+      },
+      {
+        before: "El coche de Carlos ",
+        after: " verde.",
+        answer: "es",
+        explanation: "**Ser verde** fait référence à la couleur permanente d'un objet."
+      },
+      {
+        before: "Juan ",
+        after: " muy listo, siempre obtiene las mejores notas.",
+        answer: "es",
+        explanation: "**Ser listo** veut dire être intelligent (caractéristique)[cite: 1]."
+      },
+      {
+        before: "Ya ",
+        after: " listo para salir de viaje.",
+        answer: "estoy",
+        explanation: "**Estar listo** signifie être prêt (état temporaire)."
+      },
+      {
+        before: "La reunión ",
+        after: " en la segunda planta.",
+        answer: "es",
+        explanation: "Pour un événement (réunion, fête, concert), la localisation se fait avec **SER**."
+      }
+    ],
+    // Niveau 3 : Tiempos pasados y usos avanzados
+    [
+      {
+        before: "Ayer la película ",
+        after: " muy aburrida.",
+        answer: "fue",
+        explanation: "Passé simple (**Pretérito Indefinido**) du verbe **SER** pour évaluer un événement terminé."
+      },
+      {
+        before: "Cuando éramos niños, nosotros siempre ",
+        after: " cansados después de jugar.",
+        answer: "estábamos",
+        explanation: "Imparfait (**Pretérito Imperfecto**) du verbe **ESTAR** pour décrire un état dans le passé."
+      },
+      {
+        before: "El libro ",
+        after: " escrito por Gabriel García Márquez.",
+        answer: "fue",
+        explanation: "La voix passive d'action se construit avec **SER** + participe passé."
+      },
+      {
+        before: "La puerta ",
+        after: " cerrada cuando llegué a la oficina.",
+        answer: "estaba",
+        explanation: "La voix passive d'état (résultat d'une action) se construit avec **ESTAR**."
+      },
+      {
+        before: "Aunque el profesor es muy mayor, ",
+        after: " muy joven de aspecto.",
+        answer: "está",
+        explanation: "On utilise **ESTAR** + adjectif pour exprimer une impression ou un changement par rapport à la norme."
+      }
+    ]
+  ];
+
+  let currentLevel = 0;
+  let currentIndex = 0;
+  let score = 0;
+  let isAnswered = false;
+
+  function loadQuestion() {
+    isAnswered = false;
+    const q = exercises[currentLevel][currentIndex];
+    const progressEl = document.getElementById('progress');
+    const sentenceEl = document.getElementById('sentence');
+    const feedbackEl = document.getElementById('feedback');
+    const submitBtn = document.getElementById('submit-btn');
+
+    progressEl.textContent = `Question ${currentIndex + 1} sur ${exercises[currentLevel].length}`;
+    sentenceEl.innerHTML = `${q.before} <input type="text" id="answer-input" autocomplete="off" spellcheck="false" autofocus> ${q.after}`;
+    
+    feedbackEl.className = 'feedback';
+    feedbackEl.style.display = 'none';
+    submitBtn.textContent = "Vérifier";
+
+    document.getElementById('answer-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        if (!isAnswered) {
+          checkAnswer();
+        } else {
+          nextQuestion();
+        }
+      }
+    });
+  }
+
+  function insertChar(char) {
+    const input = document.getElementById('answer-input');
+    if (input) {
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      input.value = input.value.substring(0, start) + char + input.value.substring(end);
+      input.focus();
+      input.setSelectionRange(start + 1, start + 1);
+    }
+  }
+
+  function checkAnswer() {
+    if (isAnswered) {
+      nextQuestion();
+      return;
+    }
+
+    const inputEl = document.getElementById('answer-input');
+    const userAnswer = inputEl.value.trim().toLowerCase();
+    const q = exercises[currentLevel][currentIndex];
+    const feedbackEl = document.getElementById('feedback');
+    const feedbackText = document.getElementById('feedback-text');
+    const explanationText = document.getElementById('explanation-text');
+    const submitBtn = document.getElementById('submit-btn');
+
+    if (userAnswer === "") return;
+
+    isAnswered = true;
+
+    if (userAnswer === q.answer.toLowerCase()) {
+      score++;
+      feedbackEl.className = 'feedback correct';
+      feedbackText.textContent = "¡Correcto!";
+    } else {
+      feedbackEl.className = 'feedback incorrect';
+      feedbackText.textContent = `Incorrect. La réponse exacte est : "${q.answer}"`;
+    }
+
+    explanationText.innerHTML = q.explanation;
+    submitBtn.textContent = "Continuer";
+  }
+
+  function nextQuestion() {
+    currentIndex++;
+    if (currentIndex < exercises[currentLevel].length) {
+      loadQuestion();
+    } else {
+      showScore();
+    }
+  }
+
+  function showScore() {
+    document.getElementById('quiz-container').style.display = 'none';
+    const scoreContainer = document.getElementById('score-container');
+    scoreContainer.style.display = 'block';
+    document.getElementById('final-score').textContent = `${score} / ${exercises[currentLevel].length}`;
+  }
+
+  function changeLevel(levelIndex) {
+    currentLevel = levelIndex;
+    const btns = document.querySelectorAll('.level-btn');
+    btns.forEach((btn, idx) => {
+      btn.classList.toggle('active', idx === levelIndex);
+    });
+    restartLevel();
+  }
+
+  function restartLevel() {
+    currentIndex = 0;
+    score = 0;
+    document.getElementById('score-container').style.display = 'none';
+    document.getElementById('quiz-container').style.display = 'block';
+    loadQuestion();
+  }
+
+  // Initialisation
+  loadQuestion();
+</script>
+
+</body>
+</html>
