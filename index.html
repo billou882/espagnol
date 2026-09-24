@@ -28,7 +28,7 @@
       background-color: var(--card-bg);
       border-radius: 12px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      max-width: 650px;
+      max-width: 700px;
       width: 100%;
       padding: 30px;
     }
@@ -63,23 +63,16 @@
       color: white;
     }
 
-    .progress {
-      text-align: right;
-      font-size: 0.9em;
-      color: #666;
+    .exercise-item {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 5px solid var(--primary);
       margin-bottom: 15px;
     }
 
-    .exercise-card {
-      background-color: #f8f9fa;
-      padding: 20px;
-      border-radius: 8px;
-      border-left: 5px solid var(--primary);
-      margin-bottom: 20px;
-    }
-
     .sentence {
-      font-size: 1.25em;
+      font-size: 1.1em;
       line-height: 1.6;
     }
 
@@ -103,6 +96,7 @@
       margin-top: 10px;
       display: flex;
       gap: 5px;
+      align-items: center;
     }
 
     .accent-btn {
@@ -128,49 +122,49 @@
       font-size: 1.1em;
       font-weight: bold;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 15px;
     }
 
     .action-btn:hover {
       opacity: 0.9;
     }
 
-    .feedback {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 6px;
-      font-weight: bold;
-      display: none;
-    }
-
-    .feedback.correct {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-      display: block;
-    }
-
-    .feedback.incorrect {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-      display: block;
-    }
-
-    .explanation {
-      margin-top: 5px;
-      font-weight: normal;
-      font-size: 0.95em;
-    }
-
     .score-box {
       text-align: center;
       padding: 20px;
+      background-color: #eef5fc;
+      border-radius: 8px;
+      margin-bottom: 25px;
     }
 
     .score-box h2 {
-      font-size: 2em;
+      margin: 0 0 10px 0;
       color: var(--primary);
+    }
+
+    .correction-item {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .correction-item.correct {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+
+    .correction-item.incorrect {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+
+    .explanation {
+      margin-top: 8px;
+      font-size: 0.95em;
+      font-weight: normal;
+      color: #333;
     }
   </style>
 </head>
@@ -185,227 +179,130 @@
     <button class="level-btn" onclick="changeLevel(2)">Niveau 3 : Difficile</button>
   </div>
 
+  <div class="accents-toolbar">
+    <span style="font-size:0.85em; color:#666;">Insérer un caractère :</span>
+    <button class="accent-btn" onclick="insertChar('á')">á</button>
+    <button class="accent-btn" onclick="insertChar('é')">é</button>
+    <button class="accent-btn" onclick="insertChar('í')">í</button>
+    <button class="accent-btn" onclick="insertChar('ó')">ó</button>
+    <button class="accent-btn" onclick="insertChar('ú')">ú</button>
+    <button class="accent-btn" onclick="insertChar('ñ')">ñ</button>
+  </div>
+  <br>
+
   <div id="quiz-container">
-    <div class="progress" id="progress">Question 1 sur 5</div>
-
-    <div class="exercise-card">
-      <div class="sentence" id="sentence"></div>
-      <div class="accents-toolbar">
-        <span style="font-size:0.85em; color:#666; align-self:center;">Caractères :</span>
-        <button class="accent-btn" onclick="insertChar('á')">á</button>
-        <button class="accent-btn" onclick="insertChar('é')">é</button>
-        <button class="accent-btn" onclick="insertChar('í')">í</button>
-        <button class="accent-btn" onclick="insertChar('ó')">ó</button>
-        <button class="accent-btn" onclick="insertChar('ú')">ú</button>
-        <button class="accent-btn" onclick="insertChar('ñ')">ñ</button>
-      </div>
-    </div>
-
-    <button class="action-btn" id="submit-btn" onclick="checkAnswer()">Vérifier</button>
-
-    <div id="feedback" class="feedback">
-      <div id="feedback-text"></div>
-      <div id="explanation-text" class="explanation"></div>
-    </div>
+    <div id="questions-list"></div>
+    <button class="action-btn" onclick="submitAnswers()">Voir la correction</button>
   </div>
 
-  <div id="score-container" class="score-box" style="display: none;">
-    <h2>Niveau Terminé !</h2>
-    <p id="final-score" style="font-size: 1.5em;"></p>
+  <div id="result-container" style="display: none;">
+    <div class="score-box">
+      <h2>Résultats du niveau</h2>
+      <p id="score-text" style="font-size: 1.4em; font-weight: bold; margin: 0;"></p>
+    </div>
+    <div id="corrections-list"></div>
     <button class="action-btn" onclick="restartLevel()">Recommencer ce niveau</button>
   </div>
 </div>
 
 <script>
   const exercises = [
-    // Niveau 1 : Présent simple / Cas de base
+    // Niveau 1
     [
-      {
-        before: "Yo ",
-        after: " estudiante de español.",
-        answer: "soy",
-        explanation: "On utilise **SER** pour indiquer l'identité ou la profession."
-      },
-      {
-        before: "Mis hermanos ",
-        after: " en casa hoy.",
-        answer: "están",
-        explanation: "On utilise **ESTAR** pour la localisation dans l'espace."
-      },
-      {
-        before: "Hoy María ",
-        after: " muy contenta.",
-        answer: "está",
-        explanation: "On utilise **ESTAR** pour exprimer un état d'esprit temporaire[cite: 1]."
-      },
-      {
-        before: "Nosotros ",
-        after: " de España.",
-        answer: "somos",
-        explanation: "On utilise **SER** pour la nationalité ou l'origine[cite: 1]."
-      },
-      {
-        before: "¿Tú ",
-        after: " preparado para el examen?",
-        answer: "estás",
-        explanation: "On utilise **ESTAR** pour un état d'avancement ou de préparation."
-      }
+      { before: "1. Yo ", after: " estudiante de español.", answer: "soy", explanation: "On utilise **SER** pour l'identité et la profession[cite: 1]." },
+      { before: "2. Mis hermanos ", after: " en casa hoy.", answer: "están", explanation: "On utilise **ESTAR** pour la localisation dans l'espace[cite: 1]." },
+      { before: "3. Hoy María ", after: " muy contenta.", answer: "está", explanation: "On utilise **ESTAR** pour un état d'esprit temporaire[cite: 1]." },
+      { before: "4. Nosotros ", after: " de España.", answer: "somos", explanation: "On utilise **SER** pour la nationalité et l'origine[cite: 1]." },
+      { before: "5. ¿Tú ", after: " preparado para el examen?", answer: "estás", explanation: "On utilise **ESTAR** pour un état d'avancement ou de préparation." }
     ],
-    // Niveau 2 : Nuances de sens au présent
+    // Niveau 2
     [
-      {
-        before: "Esta manzana ",
-        after: " verde, aún no se puede comer.",
-        answer: "está",
-        explanation: "**Estar verde** signifie que le fruit n'est pas mûr (état temporaire)."
-      },
-      {
-        before: "El coche de Carlos ",
-        after: " verde.",
-        answer: "es",
-        explanation: "**Ser verde** fait référence à la couleur permanente d'un objet."
-      },
-      {
-        before: "Juan ",
-        after: " muy listo, siempre obtiene las mejores notas.",
-        answer: "es",
-        explanation: "**Ser listo** veut dire être intelligent (caractéristique)[cite: 1]."
-      },
-      {
-        before: "Ya ",
-        after: " listo para salir de viaje.",
-        answer: "estoy",
-        explanation: "**Estar listo** signifie être prêt (état temporaire)."
-      },
-      {
-        before: "La reunión ",
-        after: " en la segunda planta.",
-        answer: "es",
-        explanation: "Pour un événement (réunion, fête, concert), la localisation se fait avec **SER**."
-      }
+      { before: "1. Esta manzana ", after: " verde, aún no se puede comer.", answer: "está", explanation: "**Estar verde** signifie que le fruit n'est pas mûr (état temporaire)." },
+      { before: "2. El coche de Carlos ", after: " verde.", answer: "es", explanation: "**Ser verde** fait référence à la couleur permanente d'un objet." },
+      { before: "3. Juan ", after: " muy listo, siempre obtiene las mejores notas.", answer: "es", explanation: "**Ser listo** veut dire être intelligent (caractéristique permanente)[cite: 1]." },
+      { before: "4. Ya ", after: " listo para salir de viaje.", answer: "estoy", explanation: "**Estar listo** signifie être prêt (état temporaire)." },
+      { before: "5. La reunión ", after: " en la segunda planta.", answer: "es", explanation: "Pour un événement (réunion, fête, concert), la localisation se fait avec **SER**." }
     ],
-    // Niveau 3 : Tiempos pasados y usos avanzados
+    // Niveau 3
     [
-      {
-        before: "Ayer la película ",
-        after: " muy aburrida.",
-        answer: "fue",
-        explanation: "Passé simple (**Pretérito Indefinido**) du verbe **SER** pour évaluer un événement terminé."
-      },
-      {
-        before: "Cuando éramos niños, nosotros siempre ",
-        after: " cansados después de jugar.",
-        answer: "estábamos",
-        explanation: "Imparfait (**Pretérito Imperfecto**) du verbe **ESTAR** pour décrire un état dans le passé."
-      },
-      {
-        before: "El libro ",
-        after: " escrito por Gabriel García Márquez.",
-        answer: "fue",
-        explanation: "La voix passive d'action se construit avec **SER** + participe passé."
-      },
-      {
-        before: "La puerta ",
-        after: " cerrada cuando llegué a la oficina.",
-        answer: "estaba",
-        explanation: "La voix passive d'état (résultat d'une action) se construit avec **ESTAR**."
-      },
-      {
-        before: "Aunque el profesor es muy mayor, ",
-        after: " muy joven de aspecto.",
-        answer: "está",
-        explanation: "On utilise **ESTAR** + adjectif pour exprimer une impression ou un changement par rapport à la norme."
-      }
+      { before: "1. Ayer la película ", after: " muy aburrida.", answer: "fue", explanation: "Passé simple (**Pretérito Indefinido**) de **SER** pour évaluer un événement terminé." },
+      { before: "2. Cuando éramos niños, nosotros siempre ", after: " cansados después de jugar.", answer: "estábamos", explanation: "Imparfait (**Pretérito Imperfecto**) de **ESTAR** pour décrire un état habituel dans le passé." },
+      { before: "3. El libro ", after: " escrito por Gabriel García Márquez.", answer: "fue", explanation: "La voix passive d'action se construit avec **SER** + participe passé." },
+      { before: "4. La puerta ", after: " cerrada cuando llegué a la oficina.", answer: "estaba", explanation: "La voix passive d'état (résultat d'une action) se construit avec **ESTAR**." },
+      { before: "5. Aunque el profesor es muy mayor, ", after: " muy joven de aspecto.", answer: "está", explanation: "On utilise **ESTAR** + adjectif pour exprimer une impression ou un changement par rapport à la norme." }
     ]
   ];
 
   let currentLevel = 0;
-  let currentIndex = 0;
-  let score = 0;
-  let isAnswered = false;
+  let activeInput = null;
 
-  function loadQuestion() {
-    isAnswered = false;
-    const q = exercises[currentLevel][currentIndex];
-    const progressEl = document.getElementById('progress');
-    const sentenceEl = document.getElementById('sentence');
-    const feedbackEl = document.getElementById('feedback');
-    const submitBtn = document.getElementById('submit-btn');
+  function loadLevel() {
+    const listEl = document.getElementById('questions-list');
+    listEl.innerHTML = '';
 
-    progressEl.textContent = `Question ${currentIndex + 1} sur ${exercises[currentLevel].length}`;
-    sentenceEl.innerHTML = `${q.before} <input type="text" id="answer-input" autocomplete="off" spellcheck="false" autofocus> ${q.after}`;
-    
-    feedbackEl.className = 'feedback';
-    feedbackEl.style.display = 'none';
-    submitBtn.textContent = "Vérifier";
-
-    document.getElementById('answer-input').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        if (!isAnswered) {
-          checkAnswer();
-        } else {
-          nextQuestion();
-        }
-      }
+    exercises[currentLevel].forEach((q, index) => {
+      const item = document.createElement('div');
+      item.className = 'exercise-item';
+      item.innerHTML = `
+        <div class="sentence">
+          ${q.before}
+          <input type="text" id="input-${index}" autocomplete="off" spellcheck="false" onfocus="activeInput = this">
+          ${q.after}
+        </div>
+      `;
+      listEl.appendChild(item);
     });
+
+    document.getElementById('quiz-container').style.display = 'block';
+    document.getElementById('result-container').style.display = 'none';
+
+    // Focus sur le premier champ
+    const firstInput = document.getElementById('input-0');
+    if (firstInput) {
+      firstInput.focus();
+      activeInput = firstInput;
+    }
   }
 
   function insertChar(char) {
-    const input = document.getElementById('answer-input');
-    if (input) {
-      const start = input.selectionStart;
-      const end = input.selectionEnd;
-      input.value = input.value.substring(0, start) + char + input.value.substring(end);
-      input.focus();
-      input.setSelectionRange(start + 1, start + 1);
+    if (!activeInput) {
+      activeInput = document.querySelector('input[type="text"]');
+    }
+    if (activeInput) {
+      const start = activeInput.selectionStart;
+      const end = activeInput.selectionEnd;
+      activeInput.value = activeInput.value.substring(0, start) + char + activeInput.value.substring(end);
+      activeInput.focus();
+      activeInput.setSelectionRange(start + 1, start + 1);
     }
   }
 
-  function checkAnswer() {
-    if (isAnswered) {
-      nextQuestion();
-      return;
-    }
+  function submitAnswers() {
+    let score = 0;
+    const currentExercises = exercises[currentLevel];
+    const correctionsList = document.getElementById('corrections-list');
+    correctionsList.innerHTML = '';
 
-    const inputEl = document.getElementById('answer-input');
-    const userAnswer = inputEl.value.trim().toLowerCase();
-    const q = exercises[currentLevel][currentIndex];
-    const feedbackEl = document.getElementById('feedback');
-    const feedbackText = document.getElementById('feedback-text');
-    const explanationText = document.getElementById('explanation-text');
-    const submitBtn = document.getElementById('submit-btn');
+    currentExercises.forEach((q, index) => {
+      const inputEl = document.getElementById(`input-${index}`);
+      const userAnswer = inputEl ? inputEl.value.trim().toLowerCase() : '';
+      const isCorrect = userAnswer === q.answer.toLowerCase();
 
-    if (userAnswer === "") return;
+      if (isCorrect) score++;
 
-    isAnswered = true;
+      const corrItem = document.createElement('div');
+      corrItem.className = `correction-item ${isCorrect ? 'correct' : 'incorrect'}`;
+      corrItem.innerHTML = `
+        <strong>${q.before} <u style="text-decoration-thickness: 2px;">${userAnswer || '___'}</u> ${q.after}</strong>
+        ${!isCorrect ? `<br><span>Réponse correcte : <strong>${q.answer}</strong></span>` : ''}
+        <div class="explanation">${q.explanation}</div>
+      `;
+      correctionsList.appendChild(corrItem);
+    });
 
-    if (userAnswer === q.answer.toLowerCase()) {
-      score++;
-      feedbackEl.className = 'feedback correct';
-      feedbackText.textContent = "¡Correcto!";
-    } else {
-      feedbackEl.className = 'feedback incorrect';
-      feedbackText.textContent = `Incorrect. La réponse exacte est : "${q.answer}"`;
-    }
-
-    explanationText.innerHTML = q.explanation;
-    submitBtn.textContent = "Continuer";
-  }
-
-  function nextQuestion() {
-    currentIndex++;
-    if (currentIndex < exercises[currentLevel].length) {
-      loadQuestion();
-    } else {
-      showScore();
-    }
-  }
-
-  function showScore() {
+    document.getElementById('score-text').textContent = `${score} / ${currentExercises.length}`;
     document.getElementById('quiz-container').style.display = 'none';
-    const scoreContainer = document.getElementById('score-container');
-    scoreContainer.style.display = 'block';
-    document.getElementById('final-score').textContent = `${score} / ${exercises[currentLevel].length}`;
+    document.getElementById('result-container').style.display = 'block';
   }
 
   function changeLevel(levelIndex) {
@@ -414,19 +311,15 @@
     btns.forEach((btn, idx) => {
       btn.classList.toggle('active', idx === levelIndex);
     });
-    restartLevel();
+    loadLevel();
   }
 
   function restartLevel() {
-    currentIndex = 0;
-    score = 0;
-    document.getElementById('score-container').style.display = 'none';
-    document.getElementById('quiz-container').style.display = 'block';
-    loadQuestion();
+    loadLevel();
   }
 
-  // Initialisation
-  loadQuestion();
+  // Initialisation au chargement de la page
+  loadLevel();
 </script>
 
 </body>
